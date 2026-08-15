@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Study Assistant</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        #chat {
+            border: 1px solid #ddd;
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .user {
+            margin: 15px 0;
+            padding: 12px;
+            background: #e8f0fe;
+        }
+
+        .ai {
+            margin: 15px 0;
+            padding: 12px;
+            background: #f5f5f5;
+        }
+
+        input {
+            width: 75%;
+            padding: 12px;
+        }
+
+        button {
+            padding: 12px 20px;
+        }
+        .markdown-content {
+    line-height: 1.6;
+    margin-top: 8px;
+}
+
+.markdown-content p {
+    margin: 8px 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+    margin-top: 18px;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    padding-left: 25px;
+}
+
+.markdown-content code {
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: #eeeeee;
+}
+
+.markdown-content pre {
+    padding: 12px;
+    overflow-x: auto;
+    border-radius: 8px;
+    background: #eeeeee;
+}
+
+.markdown-content table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.markdown-content th,
+.markdown-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid #999;
+    padding-left: 15px;
+    margin-left: 0;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+
+<script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+    };
+</script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    async>
+</script>
+
+</head>
+
+<body>
+
+<a href="{% url 'dashboard' %}">
+    ← Dashboard
+</a>
+
+<h1>🤖 AI Study Assistant</h1>
+
+<p>
+    Chat: {{ session.title }}
+</p>
+
+<div id="chat">
+
+    {% for message in messages %}
+
+        {% if message.role == "user" %}
+
+            <div class="user">
+
+                <strong>You:</strong>
+
+                <br>
+
+                {{ message.content }}
+
+            </div>
+
+        {% else %}
+
+          <div class="ai">
+
+                <strong>AI:</strong>
+
+                 <div class="markdown-content">
+                     {{ message.content }}
+                 </div>
+
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+
+</div>
+
+<br>
+
+
+
+<input
+    id="message"
+    type="text"
+    placeholder="Ask your study question..."
+>
+
+<button onclick="sendMessage()">
+    Send
+</button>
+
+<script>
+
+function renderMarkdown(text) {
+
+    const html = marked.parse(text);
+
+    return DOMPurify.sanitize(html);
+}
+
+
+async function sendMessage() {
+
+    const input =
+        document.getElementById("message");
+
+    const chat =
+        document.getElementById("chat");
+
+    const message =
+        input.value.trim();
+
+    if (!message) {
+        return;
+    }
+
+
+    // User message
+
+    const userDiv =
+        document.createElement("div");
+
+    userDiv.className = "user";
+
+    userDiv.innerHTML = `
+        <strong>You:</strong>
+        <br>
+        ${DOMPurify.sanitize(message)}
+    `;
+
+    chat.appendChild(userDiv);
+
+
+    input.value = "";
+
+
+    // Loading message
+
+    const loadingDiv =
+        document.createElement("div");
+
+    loadingDiv.className = "ai";
+
+    loadingDiv.innerHTML = `
+        <strong>AI:</strong>
+        <br>
+        <span>Thinking...</span>
+    `;
+
+    chat.appendChild(loadingDiv);
+
+
+    chat.scrollTop = chat.scrollHeight;
+
+
+    try {
+
+        const csrfToken =
+            getCookie("csrftoken");
+
+
+        const response = await fetch(
+            "{% url 'chat_api' %}",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+
+                body: JSON.stringify({
+                    message: message,
+                    session_id: {{ session.id }}
+                })
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (data.answer) {
+
+            loadingDiv.innerHTML = `
+                <strong>AI:</strong>
+                <div class="markdown-content">
+                    ${renderMarkdown(data.answer)}
+                </div>
+            `;
+
+            // Render mathematical equations
+
+            if (window.MathJax) {
+
+                MathJax.typesetPromise([
+                    loadingDiv
+                ]);
+
+            }
+
+        } else {
+
+            loadingDiv.innerHTML = `
+                <strong>AI:</strong>
+                <br>
+                ${DOMPurify.sanitize(
+                    data.error || "Something went wrong."
+                )}
+            `;
+        }
+
+
+    } catch (error) {
+
+        loadingDiv.innerHTML = `
+            <strong>AI:</strong>
+            <br>
+            Unable to connect to AI server.
+        `;
+
+        console.error(error);
+
+    }
+
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+
+
+function getCookie(name) {
+
+    let cookieValue = null;
+
+
+    if (document.cookie) {
+
+        const cookies =
+            document.cookie.split(";");
+
+
+        for (let cookie of cookies) {
+
+            cookie = cookie.trim();
+
+
+            if (
+                cookie.substring(
+                    0,
+                    name.length + 1
+                ) === name + "="
+            ) {
+
+                cookieValue =
+                    decodeURIComponent(
+                        cookie.substring(
+                            name.length + 1
+                        )
+                    );
+
+                break;
+            }
+        }
+    }
+
+
+    return cookieValue;
+}
+
+
+// Render old messages from database
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const aiMessages =
+            document.querySelectorAll(
+                ".ai .markdown-content"
+            );
+
+
+        aiMessages.forEach(
+            function (element) {
+
+                const text =
+                    element.textContent;
+
+                element.innerHTML =
+                    renderMarkdown(text);
+
+            }
+        );
+
+
+        if (window.MathJax) {
+
+            MathJax.typesetPromise();
+
+        }
+
+    }
+);
+
+</script>
+</body>
+
+</html>

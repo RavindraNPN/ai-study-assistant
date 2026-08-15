@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>{{ pdf.title }}</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .summary {
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+
+        .text {
+            white-space: normal;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<a href="{% url 'dashboard' %}">
+    ← Dashboard
+</a>
+
+<h1>📄 {{ pdf.title }}</h1>
+
+<p>
+    Uploaded: {{ pdf.uploaded_at }}
+</p>
+
+<hr>
+
+<h2>🤖 AI Study Summary</h2>
+
+<hr>
+
+<hr>
+
+<h2>💬 Ask Questions from this PDF</h2>
+
+<div class="chat-container">
+
+    {% for message in chat_messages %}
+
+        <div class="user-message">
+
+            <strong>👤 You:</strong>
+
+            <p>
+                {{ message.question }}
+            </p>
+
+        </div>
+
+        <div class="ai-message">
+
+            <strong>🤖 AI:</strong>
+
+            <p>
+                {{ message.answer|linebreaks }}
+            </p>
+
+        </div>
+
+        <hr>
+
+    {% empty %}
+
+        <p>
+            No questions asked yet.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <input
+        type="hidden"
+        name="action"
+        value="question"
+    >
+
+    <textarea
+        name="question"
+        rows="4"
+        placeholder="Ask something about this PDF..."
+        required
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">
+        🤖 Ask AI
+    </button>
+
+</form>
+
+{% if answer %}
+
+    <h3>🤖 AI Answer</h3>
+
+    <div class="summary">
+
+        {{ answer|linebreaks }}
+
+    </div>
+
+{% endif %}
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <button type="submit">
+        ✨ Generate Summary
+    </button>
+
+</form>
+
+<br>
+
+{% if summary %}
+
+    <div class="summary">
+
+        {{ summary|linebreaks }}
+
+    </div>
+
+{% endif %}
+
+<hr>
+
+<!-- <h2>📖 Extracted Text</h2>
+
+<div class="text">
+
+    {{ pdf.extracted_text|linebreaks }}
+
+</div> -->
+
+</body>
+
+</html>

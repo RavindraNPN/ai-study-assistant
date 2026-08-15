@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Account</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 400px;
+            margin: 80px auto;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🎓 Create Account</h1>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Create Account
+    </button>
+
+</form>
+
+<p>
+    Already have an account?
+    <a href="{% url 'login' %}">
+        Login
+    </a>
+</p>
+
+</body>
+</html>

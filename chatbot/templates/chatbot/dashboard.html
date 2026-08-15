@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Study Assistant</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f7f8;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: block;
+            padding: 11px 14px;
+            margin-bottom: 10px;
+            background: #222;
+            color: white;
+            text-decoration: none;
+            border-radius: 7px;
+            text-align: center;
+        }
+
+        .section-title {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .history-item {
+            display: block;
+            padding: 10px;
+            margin-bottom: 5px;
+            color: #222;
+            text-decoration: none;
+            border-radius: 7px;
+        }
+
+        .history-item:hover {
+            background: #f0f0f0;
+        }
+
+        .history-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .date {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .empty {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .user-area {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            flex: 1;
+            padding: 40px;
+            max-width: 1000px;
+        }
+
+        .welcome {
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .logout-button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🎓 AI Study Assistant
+        </div>
+
+
+        <!-- New Chat -->
+
+        <a
+            href="{% url 'new_chat' %}"
+            class="button"
+        >
+            + New Chat
+        </a>
+
+
+        <!-- Upload PDF -->
+
+        <a
+            href="{% url 'upload_pdf' %}"
+            class="button"
+        >
+            📄 Upload Study Material
+        </a>
+
+
+        <!-- Chat History -->
+
+        <div class="section-title">
+            💬 CHAT HISTORY
+        </div>
+
+
+        {% for session in sessions %}
+
+            <a
+                href="{% url 'chat_session' session.id %}"
+                class="history-item"
+            >
+
+                <div class="history-title">
+
+                    💬 {{ session.title }}
+
+                </div>
+
+                <div class="date">
+
+                    {{ session.updated_at }}
+
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <p class="empty">
+                No chats yet.
+            </p>
+
+        {% endfor %}
+
+
+        <!-- PDF History -->
+
+        <div class="section-title">
+            📚 PDF HISTORY
+        </div>
+
+
+        {% for pdf in pdfs %}
+
+            <a
+                href="{% url 'pdf_detail' pdf.id %}"
+                class="history-item"
+            >
+
+                <div class="history-title">
+
+                    📄 {{ pdf.title }}
+
+                </div>
+
+                <div class="date">
+
+                    {{ pdf.uploaded_at }}
+
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <p class="empty">
+                No PDFs uploaded yet.
+            </p>
+
+        {% endfor %}
+
+
+        <!-- User -->
+
+        <div class="user-area">
+
+            <strong>
+                👤 {{ user.username }}
+            </strong>
+
+            <br><br>
+
+            <form
+                method="POST"
+                action="{% url 'logout' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="logout-button"
+                >
+                    🚪 Logout
+                </button>
+
+            </form>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main">
+
+        <div class="welcome">
+
+            <h1>
+                Welcome, {{ user.username }} 👋
+            </h1>
+
+            <p>
+                Your personal AI Study Assistant
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h2>
+                📚 Study Dashboard
+            </h2>
+
+            <p>
+                Upload your study material or
+                start a new conversation.
+            </p>
+
+            <a
+                href="{% url 'upload_pdf' %}"
+                class="button"
+                style="width:220px;"
+            >
+                📄 Upload PDF
+            </a>
+
+        </div>
+
+    </main>
+
+
+</div>
+
+</body>
+
+</html>
