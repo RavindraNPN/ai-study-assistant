@@ -3,163 +3,496 @@
 
 <head>
 
-    <title>{{ pdf.title }}</title>
+    <title>{{ pdf.title }} - AI Study Assistant</title>
 
     <style>
 
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
+            background: #f7f7f8;
+            margin: 0;
+        }
+
+        .container {
             max-width: 900px;
             margin: 40px auto;
-        }
-
-        .summary {
             padding: 20px;
-            background: #f5f5f5;
-            border-radius: 10px;
-            line-height: 1.6;
         }
 
-        button {
-            padding: 12px 20px;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #222;
+            color: white;
+            text-decoration: none;
+            border-radius: 7px;
+            border: none;
             cursor: pointer;
         }
 
-        .text {
-            white-space: normal;
+        .card {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
         }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            resize: vertical;
+        }
+
+        .user-message {
+            background: #eeeeee;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        .ai-message {
+            background: #f5f5f5;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .empty {
+            color: #777;
+        }
+        /* =========================
+   AI SUMMARY UI
+========================= */
+
+.summary-card {
+    background: white;
+    border: 1px solid #e2e2e2;
+    border-radius: 16px;
+    margin-top: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.summary-header {
+    padding: 22px 24px;
+    background: #fafafa;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.summary-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.summary-header p {
+    margin: 7px 0 0;
+    color: #777;
+}
+
+.summary-body {
+    padding: 25px;
+}
+
+
+/* Summary headings */
+
+.summary-content h1 {
+    font-size: 28px;
+    margin-top: 25px;
+    margin-bottom: 12px;
+}
+
+.summary-content h2 {
+    font-size: 23px;
+    margin-top: 30px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-content h3 {
+    font-size: 19px;
+    margin-top: 24px;
+}
+
+
+/* Paragraph */
+
+.summary-content p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #333;
+}
+
+
+/* Lists */
+
+.summary-content ul,
+.summary-content ol {
+    padding-left: 25px;
+}
+
+.summary-content li {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+
+/* Bold */
+
+.summary-content strong {
+    font-weight: 700;
+}
+
+
+/* Code */
+
+.summary-content code {
+    background: #f1f1f1;
+    padding: 3px 7px;
+    border-radius: 5px;
+    font-family: Consolas, monospace;
+}
+
+.summary-content pre {
+    background: #1e1e1e;
+    color: white;
+    padding: 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.summary-content pre code {
+    background: transparent;
+    padding: 0;
+}
+
+
+/* Quote */
+
+.summary-content blockquote {
+    border-left: 4px solid #555;
+    padding-left: 15px;
+    margin-left: 0;
+    color: #555;
+}
+
+
+/* Table */
+
+.summary-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.summary-content th,
+.summary-content td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.summary-content th {
+    background: #f5f5f5;
+}
+
+
+/* Important section */
+
+.summary-section {
+    background: #fafafa;
+    padding: 18px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .summary-body {
+        padding: 17px;
+    }
+
+    .summary-header {
+        padding: 18px;
+    }
+
+    .summary-header h2 {
+        font-size: 21px;
+    }
+
+    .summary-content h2 {
+        font-size: 20px;
+    }
+
+    .summary-content p,
+    .summary-content li {
+        font-size: 15px;
+    }
+
+    .summary-content table {
+        display: block;
+        overflow-x: auto;
+    }
+
+}
 
     </style>
 
 </head>
 
+
 <body>
 
-<a href="{% url 'dashboard' %}">
-    ← Dashboard
-</a>
+<div class="container">
 
-<h1>📄 {{ pdf.title }}</h1>
 
-<p>
-    Uploaded: {{ pdf.uploaded_at }}
-</p>
+    <!-- HEADER -->
 
-<hr>
+    <div class="header">
 
-<h2>🤖 AI Study Summary</h2>
+        <div>
 
-<hr>
+            <h1>
+                📄 {{ pdf.title }}
+            </h1>
 
-<hr>
-
-<h2>💬 Ask Questions from this PDF</h2>
-
-<div class="chat-container">
-
-    {% for message in chat_messages %}
-
-        <div class="user-message">
-
-            <strong>👤 You:</strong>
-
-            <p>
-                {{ message.question }}
-            </p>
+            <small>
+                Uploaded: {{ pdf.uploaded_at }}
+            </small>
 
         </div>
 
-        <div class="ai-message">
 
-            <strong>🤖 AI:</strong>
+        <a
+            href="{% url 'dashboard' %}"
+            class="button"
+        >
+            ← Dashboard
+        </a>
 
-            <p>
-                {{ message.answer|linebreaks }}
-            </p>
+    </div>
 
-        </div>
 
-        <hr>
+    <!-- SUMMARY -->
 
-    {% empty %}
+    <!-- =========================
+     AI SUMMARY
+========================= -->
+
+<div class="summary-card">
+
+    <div class="summary-header">
+
+        <h2>
+            🤖 AI Study Summary
+        </h2>
 
         <p>
-            No questions asked yet.
+            Student-friendly summary generated from this PDF
         </p>
 
-    {% endfor %}
+    </div>
+
+
+    <div class="summary-body">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="summary"
+            >
+
+            <button
+                type="submit"
+                class="button"
+            >
+                ✨ Generate Summary
+            </button>
+
+        </form>
+
+
+        {% if summary_html %}
+
+            <hr style="margin:25px 0;">
+
+
+            <div class="summary-content">
+
+                {{ summary_html|safe }}
+
+            </div>
+
+        {% else %}
+
+            <div style="
+                text-align:center;
+                padding:40px 10px;
+                color:#777;
+            ">
+
+                <div style="font-size:40px;">
+                    📚
+                </div>
+
+                <h3>
+                    No summary generated yet
+                </h3>
+
+                <p>
+                    Click "Generate Summary" to create
+                    an easy-to-understand study summary.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
 
 </div>
 
 
-<form method="POST">
+    <!-- ASK QUESTION -->
 
-    {% csrf_token %}
+    <div class="card">
 
-    <input
-        type="hidden"
-        name="action"
-        value="question"
-    >
+        <h2>
+            💬 Ask Questions from this PDF
+        </h2>
 
-    <textarea
-        name="question"
-        rows="4"
-        placeholder="Ask something about this PDF..."
-        required
-    ></textarea>
 
-    <br><br>
+        <form method="POST">
 
-    <button type="submit">
-        🤖 Ask AI
-    </button>
+            {% csrf_token %}
 
-</form>
+            <input
+                type="hidden"
+                name="action"
+                value="question"
+            >
 
-{% if answer %}
 
-    <h3>🤖 AI Answer</h3>
+            <textarea
+                name="question"
+                placeholder="Ask something from this PDF..."
+                required
+            ></textarea>
 
-    <div class="summary">
 
-        {{ answer|linebreaks }}
+            <br><br>
+
+
+            <button
+                type="submit"
+                class="button"
+            >
+                🤖 Ask AI
+            </button>
+
+        </form>
+
+
+        {% if question and answer %}
+
+            <div class="user-message">
+
+                <strong>
+                    👤 You
+                </strong>
+
+                <p>
+                    {{ question }}
+                </p>
+
+            </div>
+
+
+            <div class="ai-message">
+
+                <strong>
+                    🤖 AI
+                </strong>
+
+                <p>
+                    {{ answer|linebreaks }}
+                </p>
+
+            </div>
+
+        {% endif %}
 
     </div>
 
-{% endif %}
 
-<form method="POST">
+    <!-- CHAT HISTORY -->
 
-    {% csrf_token %}
+    <div class="card">
 
-    <button type="submit">
-        ✨ Generate Summary
-    </button>
+        <h2>
+            💬 PDF Chat History
+        </h2>
 
-</form>
 
-<br>
+        {% for message in chat_messages %}
 
-{% if summary %}
+            <div class="user-message">
 
-    <div class="summary">
+                <strong>
+                    👤 You
+                </strong>
 
-        {{ summary|linebreaks }}
+                <p>
+                    {{ message.question }}
+                </p>
+
+            </div>
+
+
+            <div class="ai-message">
+
+                <strong>
+                    🤖 AI
+                </strong>
+
+                <p>
+                    {{ message.answer|linebreaks }}
+                </p>
+
+            </div>
+
+        {% empty %}
+
+            <p class="empty">
+                No questions asked from this PDF yet.
+            </p>
+
+        {% endfor %}
 
     </div>
 
-{% endif %}
 
-<hr>
-
-<!-- <h2>📖 Extracted Text</h2>
-
-<div class="text">
-
-    {{ pdf.extracted_text|linebreaks }}
-
-</div> -->
+</div>
 
 </body>
 

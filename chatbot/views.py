@@ -14,6 +14,8 @@ from .models import *
 from .services.ai_service import ask_ai
 
 from django.contrib import messages
+import markdown
+import bleach
 
 from .services.pdf_service import (
     extract_text_from_pdf,
@@ -250,7 +252,6 @@ def upload_pdf(request):
         request,
         "chatbot/upload_pdf.html"
     )
-
 @login_required
 def pdf_detail(request, pdf_id):
 
@@ -265,11 +266,12 @@ def pdf_detail(request, pdf_id):
     summary = None
     answer = None
     question = None
+    summary_html = None
 
     chat_messages = PDFChatMessage.objects.filter(
         pdf=pdf,
         user=request.user
-    )
+    ).order_by("created_at")
 
     if request.method == "POST":
 
@@ -282,7 +284,46 @@ def pdf_detail(request, pdf_id):
         if action == "summary":
 
             summary = summarize_pdf(
-                pdf.extracted_text
+            pdf.extracted_text
+         )
+
+            summary_html = markdown.markdown(
+            summary,
+            extensions=[
+            "extra",
+            "fenced_code",
+            "tables"
+            ]
+            )
+
+            allowed_tags = [
+                "p",
+                "br",
+                "strong",
+                "em",
+                "h1",
+                "h2",
+                "h3",
+                "h4",
+                "ul",
+                "ol",
+                "li",
+                "blockquote",
+                "pre",
+                "code",
+                "table",
+                "thead",
+                "tbody",
+                "tr",
+                "th",
+                "td",
+                "hr"
+            ]
+
+            summary_html = bleach.clean(
+                summary_html,
+                tags=allowed_tags,
+                strip=True
             )
 
         # =========================
@@ -311,19 +352,22 @@ def pdf_detail(request, pdf_id):
                     answer=answer
                 )
 
+                # Refresh history
                 chat_messages = PDFChatMessage.objects.filter(
                     pdf=pdf,
                     user=request.user
-                )
+                ).order_by("created_at")
 
     return render(
         request,
         "chatbot/pdf_detail.html",
         {
+
             "pdf": pdf,
             "summary": summary,
             "question": question,
             "answer": answer,
             "chat_messages": chat_messages,
+            "summary_html": summary_html,
         }
     )

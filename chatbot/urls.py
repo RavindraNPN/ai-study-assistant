@@ -44,5 +44,6 @@ urlpatterns = [
         views.pdf_detail,
         name="pdf_detail"
     ),
+    
 
 ]
