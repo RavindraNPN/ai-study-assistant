@@ -1,3 +1,5 @@
+import os
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 
@@ -30,8 +32,14 @@ def get_embedding_model():
 # 2. CHROMADB
 # =========================================================
 
+CHROMA_PATH = os.path.join(
+    "media",
+    "chroma"
+)
+
+
 chroma_client = chromadb.PersistentClient(
-    path="media/chroma"
+    path=CHROMA_PATH
 )
 
 
@@ -44,7 +52,13 @@ collection = chroma_client.get_or_create_collection(
 # 3. CREATE TEXT CHUNKS
 # =========================================================
 
-def create_chunks(text, chunk_size=4000):
+def create_chunks(
+    text,
+    chunk_size=4000
+):
+
+    if not text:
+        return []
 
     text = text.strip()
 
@@ -61,16 +75,18 @@ def create_chunks(text, chunk_size=4000):
 
         chunk = text[start:end]
 
-        # Try not to cut the text in the middle
+        # Try to avoid cutting sentences/paragraphs
         if end < len(text):
 
             last_break = max(
                 chunk.rfind("\n"),
                 chunk.rfind(". "),
-                chunk.rfind("। ")
+                chunk.rfind("। "),
+                chunk.rfind("? "),
+                chunk.rfind("! ")
             )
 
-            if last_break > chunk_size * 0.6:
+            if last_break > chunk_size * 0.60:
 
                 end = start + last_break + 1
 
@@ -87,16 +103,66 @@ def create_chunks(text, chunk_size=4000):
 
 
 # =========================================================
-# 4. INDEX PDF
+# 4. DELETE OLD PDF INDEX
 # =========================================================
 
-def index_pdf(pdf_id, user_id, text):
+def delete_pdf_index(
+    pdf_id,
+    user_id
+):
 
+    try:
+
+        collection.delete(
+            where={
+                "$and": [
+                    {
+                        "pdf_id": str(pdf_id)
+                    },
+                    {
+                        "user_id": str(user_id)
+                    }
+                ]
+            }
+        )
+
+        print(
+            f"Old index deleted for PDF {pdf_id}"
+        )
+
+    except Exception as e:
+
+        print(
+            f"Could not delete old index: {e}"
+        )
+
+
+# =========================================================
+# 5. INDEX PDF
+# =========================================================
+
+def index_pdf(
+    pdf_id,
+    user_id,
+    text
+):
+
+    # Create chunks
     chunks = create_chunks(text)
 
     if not chunks:
 
+        print(
+            f"PDF {pdf_id} has no text to index."
+        )
+
         return 0
+
+    # Remove previous index
+    delete_pdf_index(
+        pdf_id,
+        user_id
+    )
 
     ids = []
 
@@ -105,7 +171,7 @@ def index_pdf(pdf_id, user_id, text):
     for index, chunk in enumerate(chunks):
 
         ids.append(
-            f"pdf_{pdf_id}_chunk_{index}"
+            f"pdf_{pdf_id}_user_{user_id}_chunk_{index}"
         )
 
         metadatas.append(
@@ -124,7 +190,7 @@ def index_pdf(pdf_id, user_id, text):
         show_progress_bar=False
     ).tolist()
 
-    # Store in ChromaDB
+    # Store everything in ChromaDB
     collection.upsert(
         ids=ids,
         documents=chunks,
@@ -141,17 +207,27 @@ def index_pdf(pdf_id, user_id, text):
 
 
 # =========================================================
-# 5. SEARCH RELEVANT PDF CONTENT
+# 6. SEARCH PDF
 # =========================================================
 
 def search_pdf(
     pdf_id,
     user_id,
     question,
-    top_k=4
+    top_k=5
 ):
 
-    # Generate embedding for question
+    if not question:
+
+        return []
+
+    question = question.strip()
+
+    if not question:
+
+        return []
+
+    # Generate question embedding
     model = get_embedding_model()
 
     question_embedding = model.encode(
@@ -159,7 +235,7 @@ def search_pdf(
         show_progress_bar=False
     ).tolist()
 
-    # Search ChromaDB
+    # Search only inside this user's PDF
     results = collection.query(
         query_embeddings=question_embedding,
         n_results=top_k,
@@ -177,7 +253,60 @@ def search_pdf(
 
     documents = results.get(
         "documents",
-        [[]]
-    )[0]
+        []
+    )
 
-    return documents
+    if not documents:
+
+        return []
+
+    # Chroma returns list of lists
+    documents = documents[0]
+
+    return [
+        document
+        for document in documents
+        if document
+    ]
+
+
+# =========================================================
+# 7. GET RELEVANT CONTEXT
+# =========================================================
+
+def get_pdf_context(
+    pdf_id,
+    user_id,
+    question,
+    top_k=5
+):
+
+    documents = search_pdf(
+        pdf_id=pdf_id,
+        user_id=user_id,
+        question=question,
+        top_k=top_k
+    )
+
+    if not documents:
+
+        return ""
+
+    context_parts = []
+
+    for index, document in enumerate(
+        documents,
+        start=1
+    ):
+
+        context_parts.append(
+            f"""
+--- Relevant Section {index} ---
+
+{document}
+"""
+        )
+
+    return "\n".join(
+        context_parts
+    )
