@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ test.title }}</title>
+</head>
+
+<body>
+
+<h1>{{ test.title }}</h1>
+
+<p>
+    Subject: {{ test.subject.name }}
+</p>
+
+<p>
+    Duration: {{ test.duration_minutes }} minutes
+</p>
+
+<p>
+    Total Marks: {{ test.total_marks }}
+</p>
+
+<hr>
+
+<h2>Questions</h2>
+
+<ol>
+
+{% for item in questions %}
+
+<li>
+    {{ item.question.question_text }}
+    — {{ item.marks }} marks
+</li>
+
+{% empty %}
+
+<li>No questions added to this test.</li>
+
+{% endfor %}
+
+</ol>
+
+<br>
+
+<a href="{% url 'exam:start_test' test.id %}">
+    Start Test
+</a>
+
+</body>
+</html>

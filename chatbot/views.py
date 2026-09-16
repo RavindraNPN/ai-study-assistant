@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 from .models import *
 from .services.ai_service import ask_ai
 
-from django.contrib import messages
+from django.contrib import messages, sessions
 import markdown
 import bleach
 
@@ -24,6 +24,8 @@ from .services.pdf_service import (
 )
 
 from .services.rag_service import index_pdf
+
+from exam.models import MockTest
 
 @csrf_exempt
 def chat(request):
@@ -151,15 +153,23 @@ def dashboard(request):
     pdfs = UploadedPDF.objects.filter(
         user=request.user
     ).order_by("-uploaded_at")
+    mock_tests = MockTest.objects.filter(
+    is_published=True
+).select_related(
+    "subject",
+    "unit"
+)[:5]
+
 
     return render(
         request,
-        "chatbot/dashboard.html",
+         "chatbot/dashboard.html",
         {
             "sessions": sessions,
             "pdfs": pdfs,
+            "mock_tests": mock_tests,
         }
-    )
+)
 
 @login_required
 def new_chat(request):

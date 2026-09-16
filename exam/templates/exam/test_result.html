@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Result</title>
+</head>
+
+<body>
+
+<h1>Test Result</h1>
+
+<h2>{{ attempt.mock_test.title }}</h2>
+
+<p>
+    Student: {{ attempt.student.username }}
+</p>
+
+<p>
+    Score: {{ attempt.score }}
+</p>
+
+{% if attempt.is_completed %}
+    <p>Test completed.</p>
+{% else %}
+    <p>Test is not submitted yet.</p>
+{% endif %}
+
+<a href="{% url 'exam:mock_test_list' %}">
+    Back to Mock Tests
+</a>
+
+</body>
+</html>

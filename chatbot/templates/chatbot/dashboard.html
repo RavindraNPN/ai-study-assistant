@@ -1,311 +1,1408 @@
+{% load static %}
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AI Study Assistant</title>
+    <title>GTU Study Platform</title>
 
-    <style>
+   <style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        * {
-            box-sizing: border-box;
-        }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f7f7f8;
-        }
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f8fc;
+    color: #172b4d;
+}
 
-        .app {
-            display: flex;
-            min-height: 100vh;
-        }
 
-        /* ================= SIDEBAR ================= */
+a {
+    text-decoration: none;
+}
 
-        .sidebar {
-            width: 280px;
-            background: #ffffff;
-            border-right: 1px solid #ddd;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
 
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+/* ================= APP ================= */
 
-        .button {
-            display: block;
-            padding: 11px 14px;
-            margin-bottom: 10px;
-            background: #222;
-            color: white;
-            text-decoration: none;
-            border-radius: 7px;
-            text-align: center;
-        }
+.app {
+    display: flex;
+    min-height: 100vh;
+}
 
-        .section-title {
-            margin-top: 25px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #666;
-        }
 
-        .history-item {
-            display: block;
-            padding: 10px;
-            margin-bottom: 5px;
-            color: #222;
-            text-decoration: none;
-            border-radius: 7px;
-        }
+/* ================= SIDEBAR ================= */
 
-        .history-item:hover {
-            background: #f0f0f0;
-        }
+.sidebar {
+    width: 300px;
+    min-height: 100vh;
 
-        .history-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    background: linear-gradient(
+        180deg,
+        #10243f,
+        #08182c
+    );
 
-        .date {
-            font-size: 11px;
-            color: #888;
-        }
+    color: white;
 
-        .empty {
-            font-size: 13px;
-            color: #888;
-        }
+    padding: 24px 16px;
 
-        .user-area {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-        }
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
 
-        /* ================= MAIN ================= */
 
-        .main {
-            flex: 1;
-            padding: 40px;
-            max-width: 1000px;
-        }
+/* BRAND */
 
-        .welcome {
-            margin-bottom: 30px;
-        }
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
+    padding: 0 12px 30px;
+}
 
-        .logout-button {
-            border: none;
-            background: none;
-            cursor: pointer;
-            padding: 0;
-            font-size: 14px;
-        }
 
-    </style>
+.brand-icon {
+    width: 48px;
+    height: 48px;
 
+    border-radius: 14px;
+
+    background: #087cf0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 25px;
+}
+
+
+.brand h2 {
+    font-size: 19px;
+}
+
+
+.brand span {
+    font-size: 12px;
+    color: #8da5c4;
+}
+
+
+/* NAV */
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+
+.nav-item {
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 0 14px;
+
+    border-radius: 9px;
+
+    color: #b9cee8;
+
+    font-size: 15px;
+
+    transition: 0.2s;
+}
+
+
+.nav-item:hover {
+    background: #173658;
+    color: white;
+}
+
+
+.nav-item.active {
+    background: linear-gradient(
+        90deg,
+        #087cf0,
+        #0969d1
+    );
+
+    color: white;
+}
+
+
+.nav-item span:first-child {
+    width: 22px;
+    text-align: center;
+}
+
+
+.new-badge {
+    margin-left: auto;
+
+    background: #00c987;
+
+    color: white;
+
+    font-size: 11px;
+
+    padding: 4px 10px;
+
+    border-radius: 20px;
+}
+
+
+/* GOAL */
+
+.goal-card {
+    position: absolute;
+
+    left: 16px;
+    right: 16px;
+    bottom: 20px;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    background: #173452;
+}
+
+
+.goal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 18px;
+}
+
+
+.goal-card p {
+    color: #a9c0da;
+
+    line-height: 1.5;
+
+    margin-bottom: 18px;
+}
+
+
+.progress {
+    height: 8px;
+
+    background: #284968;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+}
+
+
+.progress-bar {
+    width: 60%;
+    height: 100%;
+
+    background: #12a8ff;
+
+    border-radius: 10px;
+}
+
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 7px;
+
+    font-size: 12px;
+
+    color: #dce9f7;
+}
+
+
+/* ================= MAIN ================= */
+
+.main {
+    margin-left: 300px;
+
+    width: calc(100% - 300px);
+}
+
+
+/* TOPBAR */
+
+.topbar {
+    height: 78px;
+
+    background: white;
+
+    border-bottom: 1px solid #e7edf5;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 28px;
+}
+
+
+.search-box {
+    width: 52%;
+
+    height: 42px;
+
+    background: #f2f6fb;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 15px;
+
+    gap: 10px;
+
+    color: #8ba0b9;
+}
+
+
+.search-box input {
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    width: 100%;
+
+    font-size: 14px;
+}
+
+
+.top-right {
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+}
+
+
+.notification {
+    position: relative;
+
+    font-size: 21px;
+}
+
+
+.notification span {
+    position: absolute;
+
+    right: -8px;
+    top: -8px;
+
+    background: #ef3340;
+
+    color: white;
+
+    font-size: 10px;
+
+    width: 18px;
+    height: 18px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.profile {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.profile-avatar {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #087cf0;
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+
+/* ================= CONTENT ================= */
+
+.content {
+    padding: 20px 28px 35px;
+}
+
+
+/* WELCOME */
+
+.welcome {
+    min-height: 175px;
+
+    border-radius: 14px;
+
+    padding: 30px;
+
+    background: linear-gradient(
+        110deg,
+        #eaf5ff,
+        #f7fbff
+    );
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    border: 1px solid #e0edf9;
+}
+
+
+.welcome h1 {
+    font-size: 31px;
+
+    margin-bottom: 10px;
+}
+
+
+.welcome p {
+    font-size: 17px;
+
+    color: #375579;
+
+    margin-bottom: 20px;
+}
+
+
+.student-info {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+
+.student-info span {
+    background: white;
+
+    padding: 9px 13px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    box-shadow: 0 2px 8px rgba(20, 60, 100, 0.06);
+}
+
+
+.welcome-graphic {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-size: 70px;
+
+    padding-right: 35px;
+}
+
+
+/* ================= FEATURE GRID ================= */
+
+.feature-grid {
+    display: grid;
+
+    grid-template-columns: repeat(6, 1fr);
+
+    gap: 18px;
+
+    margin-top: 18px;
+}
+
+
+.feature-card {
+    min-height: 215px;
+
+    border-radius: 13px;
+
+    padding: 20px;
+
+    border: 1px solid;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.feature-icon {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 12px;
+
+    background: white;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 23px;
+
+    margin-bottom: 16px;
+}
+
+
+.feature-card h3 {
+    font-size: 17px;
+
+    margin-bottom: 10px;
+}
+
+
+.feature-card p {
+    font-size: 13px;
+
+    line-height: 1.55;
+
+    color: #344e6d;
+
+    flex: 1;
+}
+
+
+.feature-card a {
+    align-self: flex-start;
+
+    color: white;
+
+    padding: 9px 14px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+
+/* CARD COLORS */
+
+.blue {
+    background: #eff8ff;
+    border-color: #cde8ff;
+}
+
+
+.blue a {
+    background: #087cf0;
+}
+
+
+.green {
+    background: #effcf4;
+    border-color: #ccefd9;
+}
+
+
+.green a {
+    background: #0aae68;
+}
+
+
+.purple {
+    background: #f8efff;
+    border-color: #e6d1fa;
+}
+
+
+.purple a {
+    background: #8c35ce;
+}
+
+
+.orange {
+    background: #fff7eb;
+    border-color: #f7dfb9;
+}
+
+
+.orange a {
+    background: #f58b00;
+}
+
+
+.cyan {
+    background: #effcfd;
+    border-color: #cceff2;
+}
+
+
+.cyan a {
+    background: #08aeb5;
+}
+
+
+.violet {
+    background: #f5f0ff;
+    border-color: #ded0fa;
+}
+
+
+.violet a {
+    background: #7442d1;
+}
+
+
+/* ================= TEST SECTION ================= */
+
+.tests-section {
+    background: white;
+
+    border: 1px solid #e1e9f2;
+
+    border-radius: 13px;
+
+    margin-top: 20px;
+
+    padding: 20px;
+}
+
+
+.section-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 18px;
+}
+
+
+.section-header h2 {
+    font-size: 21px;
+
+    margin-bottom: 5px;
+}
+
+
+.section-header p {
+    font-size: 13px;
+
+    color: #7890a9;
+}
+
+
+.section-header > a {
+    color: #087cf0;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* TABLE */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+}
+
+
+thead {
+    background: #f2f6fb;
+}
+
+
+th {
+    text-align: left;
+
+    padding: 13px;
+
+    color: #294665;
+
+    font-size: 12px;
+}
+
+
+td {
+    padding: 13px;
+
+    border-bottom: 1px solid #edf1f6;
+}
+
+
+.test-title {
+    font-weight: 600;
+
+    color: #243d5c;
+}
+
+
+.subject-tag,
+.unit-tag {
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+}
+
+
+.subject-tag {
+    background: #e8f4ff;
+
+    color: #0874db;
+}
+
+
+.unit-tag {
+    background: #f1edff;
+
+    color: #7651ce;
+}
+
+
+.view-btn {
+    display: inline-block;
+
+    background: #087cf0;
+
+    color: white;
+
+    padding: 8px 13px;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+
+.view-btn:hover {
+    background: #0668cc;
+}
+
+
+.empty {
+    text-align: center;
+
+    padding: 35px;
+
+    color: #8295aa;
+}
+
+
+.empty a {
+    display: inline-block;
+
+    margin-top: 10px;
+
+    color: #087cf0;
+}
+
+
+/* QUOTE */
+
+.quote {
+    margin-top: 18px;
+
+    background: #eef7ff;
+
+    border-radius: 10px;
+
+    padding: 17px;
+
+    color: #1762a2;
+
+    display: flex;
+
+    gap: 10px;
+
+    align-items: center;
+}
+
+
+.quote span {
+    margin-left: auto;
+
+    font-size: 12px;
+
+    color: #7890a9;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1200px) {
+
+    .feature-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+
+@media (max-width: 850px) {
+
+    .sidebar {
+        width: 75px;
+
+        padding: 20px 10px;
+    }
+
+
+    .brand div:last-child,
+    .nav-item span:nth-child(2),
+    .new-badge,
+    .goal-card {
+        display: none;
+    }
+
+
+    .nav-item {
+        justify-content: center;
+    }
+
+
+    .main {
+        margin-left: 75px;
+
+        width: calc(100% - 75px);
+    }
+
+
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    .welcome-graphic {
+        display: none;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .topbar {
+        padding: 0 15px;
+    }
+
+
+    .search-box {
+        width: 65%;
+    }
+
+
+    .content {
+        padding: 15px;
+    }
+
+
+    .welcome {
+        padding: 22px;
+    }
+
+
+    .welcome h1 {
+        font-size: 24px;
+    }
+
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .section-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+}
+   </style>
 </head>
-
 
 <body>
 
 <div class="app">
 
-
     <!-- ================= SIDEBAR ================= -->
 
     <aside class="sidebar">
 
-        <div class="logo">
-            🎓 AI Study Assistant
+        <div class="brand">
+
+            <div class="brand-icon">
+                🎓
+            </div>
+
+            <div>
+                <h2>GTU Study Platform</h2>
+                <span>Learn • Practice • Excel</span>
+            </div>
+
         </div>
 
 
-        <!-- New Chat -->
+        <nav class="sidebar-nav">
 
-        <a
-            href="{% url 'new_chat' %}"
-            class="button"
-        >
-            + New Chat
-        </a>
+            <a href="#" class="nav-item active">
+                <span>⌂</span>
+                <span>Dashboard</span>
+            </a>
 
+            <a href="#" class="nav-item">
+                <span>▦</span>
+                <span>My Subjects</span>
+            </a>
 
-        <!-- Upload PDF -->
+            <a href="#" class="nav-item">
+                <span>📚</span>
+                <span>Study Materials</span>
+            </a>
 
-        <a
-            href="{% url 'upload_pdf' %}"
-            class="button"
-        >
-            📄 Upload Study Material
-        </a>
+            <a href="#" class="nav-item">
+                <span>❓</span>
+                <span>Question Bank</span>
+            </a>
 
+            <!-- IMPORTANT -->
+            <a href="{% url 'exam:mock_test_list' %}" class="nav-item">
 
-        <!-- Chat History -->
+                <span>📝</span>
 
-        <div class="section-title">
-            💬 CHAT HISTORY
-        </div>
+                <span>Mock Tests</span>
 
-
-        {% for session in sessions %}
-
-            <a
-                href="{% url 'chat_session' session.id %}"
-                class="history-item"
-            >
-
-                <div class="history-title">
-
-                    💬 {{ session.title }}
-
-                </div>
-
-                <div class="date">
-
-                    {{ session.updated_at }}
-
-                </div>
+                <span class="new-badge">
+                    New
+                </span>
 
             </a>
 
-        {% empty %}
-
-            <p class="empty">
-                No chats yet.
-            </p>
-
-        {% endfor %}
-
-
-        <!-- PDF History -->
-
-        <div class="section-title">
-            📚 PDF HISTORY
-        </div>
-
-
-        {% for pdf in pdfs %}
-
-            <a
-                href="{% url 'pdf_detail' pdf.id %}"
-                class="history-item"
-            >
-
-                <div class="history-title">
-
-                    📄 {{ pdf.title }}
-
-                </div>
-
-                <div class="date">
-
-                    {{ pdf.uploaded_at }}
-
-                </div>
-
+            <a href="#" class="nav-item">
+                <span>📋</span>
+                <span>My Attempts</span>
             </a>
 
-        {% empty %}
+            <a href="#" class="nav-item">
+                <span>📊</span>
+                <span>Results</span>
+            </a>
 
-            <p class="empty">
-                No PDFs uploaded yet.
+            <a href="#" class="nav-item">
+                <span>🤖</span>
+                <span>AI Study Assistant</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <span>👤</span>
+                <span>Profile</span>
+            </a>
+
+        </nav>
+
+
+        <!-- GOAL -->
+
+        <div class="goal-card">
+
+            <div class="goal-title">
+                🎯
+                <strong>Your Goal</strong>
+            </div>
+
+            <p>
+                Small steps every day lead to big results.
             </p>
 
-        {% endfor %}
+            <div class="progress">
 
+                <div class="progress-bar"></div>
 
-        <!-- User -->
+            </div>
 
-        <div class="user-area">
-
-            <strong>
-                👤 {{ user.username }}
-            </strong>
-
-            <br><br>
-
-            <form
-                method="POST"
-                action="{% url 'logout' %}"
-            >
-
-                {% csrf_token %}
-
-                <button
-                    type="submit"
-                    class="logout-button"
-                >
-                    🚪 Logout
-                </button>
-
-            </form>
+            <div class="progress-info">
+                <span></span>
+                <span>60%</span>
+            </div>
 
         </div>
 
     </aside>
 
 
-    <!-- ================= MAIN CONTENT ================= -->
+    <!-- ================= MAIN ================= -->
 
     <main class="main">
 
-        <div class="welcome">
 
-            <h1>
-                Welcome, {{ user.username }} 👋
-            </h1>
+        <!-- TOP BAR -->
 
-            <p>
-                Your personal AI Study Assistant
-            </p>
+        <header class="topbar">
 
-        </div>
+            <div class="search-box">
+
+                <span>⌕</span>
+
+                <input
+                    type="text"
+                    placeholder="Search subjects, topics, or questions..."
+                >
+
+            </div>
 
 
-        <div class="card">
+            <div class="top-right">
 
-            <h2>
-                📚 Study Dashboard
-            </h2>
+                <div class="notification">
+                    🔔
+                    <span>3</span>
+                </div>
 
-            <p>
-                Upload your study material or
-                start a new conversation.
-            </p>
+                <div class="profile">
 
-            <a
-                href="{% url 'upload_pdf' %}"
-                class="button"
-                style="width:220px;"
-            >
-                📄 Upload PDF
-            </a>
+                    <div class="profile-avatar">
+                        {{ request.user.username|first|upper }}
+                    </div>
 
-        </div>
+                    <strong>
+                        {{ request.user.username|default:"Student" }}
+                    </strong>
+
+                    <span>⌄</span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="content">
+
+
+            <!-- ================= WELCOME ================= -->
+
+            <div class="welcome">
+
+                <div class="welcome-text">
+
+                    <h1>
+                        👋 Welcome,
+                        {{ request.user.username|default:"Student" }}!
+                    </h1>
+
+                    <p>
+                        Your GTU preparation journey continues.
+                        Keep learning and stay consistent!
+                    </p>
+
+
+                    <div class="student-info">
+
+                        <span>
+                            📚 Diploma
+                        </span>
+
+                        <span>
+                            📅 Semester 1
+                        </span>
+
+                        <span>
+                            🎯 Target: GTU Exam
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="welcome-graphic">
+
+                    <div class="books">
+                        📚
+                    </div>
+
+                    <div class="laptop">
+                        💻
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= FEATURE CARDS ================= -->
+
+            <div class="feature-grid">
+
+
+                <!-- MATERIALS -->
+
+                <div class="feature-card blue">
+
+                    <div class="feature-icon">
+                        📖
+                    </div>
+
+                    <h3>
+                        Study Materials
+                    </h3>
+
+                    <p>
+                        Access notes, PDFs & important resources
+                    </p>
+
+                    <a href="#">
+                        View Materials →
+                    </a>
+
+                </div>
+
+
+                <!-- QUESTIONS -->
+
+                <div class="feature-card green">
+
+                    <div class="feature-icon">
+                        ❓
+                    </div>
+
+                    <h3>
+                        Question Bank
+                    </h3>
+
+                    <p>
+                        Practice MCQs, PYQs & subject-wise questions
+                    </p>
+
+                    <a href="#">
+                        Start Practice →
+                    </a>
+
+                </div>
+
+
+                <!-- MOCK TEST -->
+
+                <div class="feature-card purple">
+
+                    <div class="feature-icon">
+                        📝
+                    </div>
+
+                    <h3>
+                        Mock Tests
+                    </h3>
+
+                    <p>
+                        Take full length mock tests and improve your score
+                    </p>
+
+                    <a href="{% url 'exam:mock_test_list' %}">
+                        Open Mock Tests →
+                    </a>
+
+                </div>
+
+
+                <!-- RESULTS -->
+
+                <div class="feature-card orange">
+
+                    <div class="feature-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        My Results
+                    </h3>
+
+                    <p>
+                        Track your performance and weak topics
+                    </p>
+
+                    <a href="#">
+                        View Results →
+                    </a>
+
+                </div>
+
+
+                <!-- AI -->
+
+                <div class="feature-card cyan">
+
+                    <div class="feature-icon">
+                        🤖
+                    </div>
+
+                    <h3>
+                        AI Assistant
+                    </h3>
+
+                    <p>
+                        Get instant help with your doubts
+                    </p>
+
+                    <a href="#">
+                        Chat Now →
+                    </a>
+
+                </div>
+
+
+                <!-- SUBJECTS -->
+
+                <div class="feature-card violet">
+
+                    <div class="feature-icon">
+                        🎓
+                    </div>
+
+                    <h3>
+                        My Subjects
+                    </h3>
+
+                    <p>
+                        Explore subjects, units and topics
+                    </p>
+
+                    <a href="#">
+                        View Subjects →
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= MOCK TESTS ================= -->
+
+            <div class="tests-section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            🏆 Latest Mock Tests
+                        </h2>
+
+                        <p>
+                            Practice and test your preparation
+                        </p>
+
+                    </div>
+
+
+                    <a href="{% url 'exam:mock_test_list' %}">
+                        View All Mock Tests →
+                    </a>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>Test Title</th>
+
+                                <th>Subject</th>
+
+                                <th>Unit</th>
+
+                                <th>Duration</th>
+
+                                <th>Total Marks</th>
+
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                        {% for test in mock_tests %}
+
+                            <tr>
+
+                                <td>
+                                    {{ forloop.counter }}
+                                </td>
+
+
+                                <td class="test-title">
+
+                                    {{ test.title }}
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="subject-tag">
+                                        {{ test.subject.name }}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    {% if test.unit %}
+
+                                        <span class="unit-tag">
+                                            {{ test.unit.name }}
+                                        </span>
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+                                    {{ test.duration_minutes }} mins
+                                </td>
+
+
+                                <td>
+                                    {{ test.total_marks }}
+                                </td>
+
+
+                                <td>
+
+                                    <a
+                                        href="{% url 'exam:mock_test_detail' test.id %}"
+                                        class="view-btn"
+                                    >
+                                        👁 View Test
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+
+                        {% empty %}
+
+                            <tr>
+
+                                <td
+                                    colspan="7"
+                                    class="empty"
+                                >
+
+                                    No mock tests available yet.
+
+                                    <br>
+
+                                    <a href="/admin/exam/mocktest/add/">
+                                        Add Mock Test
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div class="quote">
+
+                    💡
+
+                    <em>
+                        "Practice makes progress. Keep going!"
+                    </em>
+
+                    <span>
+                        — GTU Study Platform
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
 
     </main>
-
 
 </div>
 
 </body>
-
 </html>

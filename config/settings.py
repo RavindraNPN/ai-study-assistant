@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'academics',
     'materials',                             
     'questions',
-    'eaxm',
+    'exam',
     'rag',
 ]
 
